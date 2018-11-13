@@ -287,7 +287,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
                 }
                 catch (OverflowException e)
                 {
-                    throw new OverflowException("Byte array to large to encrypt", e);
+                    throw new OverflowException("Byte array to large to decrypt", e);
                 }
             }
         }
