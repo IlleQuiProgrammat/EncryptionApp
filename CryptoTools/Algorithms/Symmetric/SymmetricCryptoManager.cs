@@ -45,7 +45,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// <summary>
         /// The key size, in bits, to use
         /// </summary>
-        public abstract int KeySize { get; set; }
+        public abstract int? KeySize { get; set; }
 
         /// <summary>
         /// Whether the current SymmetricAlgorithm is FIPS 140-2 compliant
@@ -57,7 +57,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// </summary>
         /// <param name="memoryConst">The number of bytes to read and write</param>
         /// <param name="algorithm">The algorithm to use</param>
-        public SymmetricCryptoManager(int memoryConst, [NotNull] SymmetricAlgorithm algorithm)
+        protected SymmetricCryptoManager(int memoryConst, [NotNull] SymmetricAlgorithm algorithm)
         {
             // Assign to class field
             this.MemoryConst = memoryConst;

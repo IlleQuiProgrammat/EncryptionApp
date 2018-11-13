@@ -40,7 +40,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS, CONTRACTS_FULL</DefineConstants>
+    <DefineConstants>CODE_ANALYSIS;DEBUG;CODE_ANALYSIS, CONTRACTS_FULL</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -54,6 +54,7 @@
     <GenerateSerializationAssemblies>On</GenerateSerializationAssemblies>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DocumentationFile>bin\x64\Debug\CryptoTools.xml</DocumentationFile>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -97,15 +98,14 @@
   <ItemGroup>
     <Compile Include="Algorithms\Symmetric\Rc2CryptoManager.cs" />
     <Compile Include="Algorithms\Symmetric\TripleDesCryptoManager.cs" />
+    <Compile Include="Attributes\RuntimeObfuscatedAttribute.cs" />
     <Compile Include="Digests\KeyDerivation\Argon2KeyDerive.cs" />
     <Compile Include="Digests\KeyDerivation\BCryptKeyDerive.cs" />
     <Compile Include="Digests\KeyDerivation\Pbkdf2Advanced.cs" />
     <Compile Include="Events\DebugValuesFinalisedEventArgs.cs" />
     <Compile Include="Events\MemoryChunkChangedEventArgs.cs" />
-    <Compile Include="Exceptions\DataTooLargeException.cs" />
     <Compile Include="Exceptions\InvalidCryptographicOperationException.cs" />
     <Compile Include="Exceptions\InvalidCryptographicPropertyException.cs" />
-    <Compile Include="Exceptions\InvalidKeyException.cs" />
     <Compile Include="Exceptions\UnverifiableDataException.cs" />
     <Compile Include="Information\Contracts\HmacContract.cs" />
     <Compile Include="Information\Contracts\KeyContract.cs" />
@@ -133,6 +133,7 @@
     </Compile>
     <Compile Include="Exceptions\WeakKeyException.cs" />
     <Compile Include="Algorithms\NativeKeyEncryptor.cs" />
+    <Compile Include="SecureMemory\SecureMemoryMarshal.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="EncryptionApp.Library.CryptoTools.ruleset" />

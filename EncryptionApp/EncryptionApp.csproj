@@ -172,6 +172,7 @@
     <EmbeddedResource Include="DebugResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>DebugResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="EncryptionApp.ruleset" />
     <None Include="packages.config" />

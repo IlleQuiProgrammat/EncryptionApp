@@ -8,7 +8,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
     /// The contract for deriving a key
     /// in a specific way
     /// </summary>
-    public class KeyContract
+    public struct KeyContract
     {
         /// <summary>
         /// The constructor for this immutable

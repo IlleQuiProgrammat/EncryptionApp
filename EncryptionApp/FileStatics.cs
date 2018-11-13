@@ -72,7 +72,7 @@
                 // Continuously reads the stream in 1 mb sections until there is none left
                 while (true)
                 {
-                    if (readLength < 1024 * 1024 * 4)
+                    if (readLength < 1024 * 4)
                     {
                         // Read all bytes into the array and write them
                         var buff = new byte[readLength];
@@ -84,7 +84,7 @@
                     else
                     {
                         // Read as many bytes as we allow into the array from the file and write them
-                        var buff = new byte[1024 * 1024 * 4];
+                        var buff = new byte[1024 * 4];
                         int read = reader.Read(buff, 0, buff.Length);
                         writer.Write(buff, 0, read);
                         readLength -= read;

@@ -1,19 +1,23 @@
 ﻿using System;
+using System.Linq;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
 {
+    /// <inheritdoc cref="ValueType" />
     /// <summary>
     /// The representation of a specific HMAC
     /// verification
     /// </summary>
-    public class HmacRepresentative
+    public struct HmacRepresentative : IEquatable<HmacRepresentative>
     {
         /// <summary>
         /// The default constructor for this immutable object
         /// </summary>
         /// <param name="hashBytes"></param>
         /// <param name="hashAlgorithm"></param>
+        [JsonConstructor]
         public HmacRepresentative([NotNull] Type hashAlgorithm, [NotNull] byte[] hashBytes)
         {
             if (!hashAlgorithm.IsSubclassOf(typeof(System.Security.Cryptography.HMAC)))
@@ -34,5 +38,39 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
         /// </summary>
         [NotNull]
         public Type HashAlgorithm { get; }
+
+        /// <inheritdoc cref="ValueType" />
+        public bool Equals(HmacRepresentative other)
+        {
+            return this.HashBytes.SequenceEqual(other.HashBytes) && this.HashAlgorithm == other.HashAlgorithm;
+        }
+
+        /// <inheritdoc cref="ValueType" />
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            return obj is HmacRepresentative other && Equals(other);
+        }
+
+        /// <inheritdoc cref="ValueType" />
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (this.HashBytes.GetHashCode() * 397) ^ this.HashAlgorithm.GetHashCode();
+            }
+        }
+
+        /// <inheritdoc cref="ValueType"/>
+        public static bool operator ==(HmacRepresentative left, HmacRepresentative right)
+        {
+            return left.Equals(right);
+        }
+
+        /// <inheritdoc cref="ValueType"/>
+        public static bool operator !=(HmacRepresentative left, HmacRepresentative right)
+        {
+            return !(left == right);
+        }
     }
 }

@@ -47,17 +47,17 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// Valid sizes are 128, 192, and 256
         /// </summary>
         /// <exception cref="T:System.ArgumentException"></exception>
-        public override int KeySize
+        public override int? KeySize
         {
             get => SymmetricAlgorithm.KeySize;
             set
             {
-                if (value != 192)
+                if (value.HasValue && value != 192)
                 {
                     throw new ArgumentException("Key is not a valid length");
                 }
-
-                SymmetricAlgorithm.KeySize = value;
+                
+                SymmetricAlgorithm.KeySize = value ?? this.SymmetricAlgorithm.KeySize;
             }
         }
 
@@ -69,11 +69,11 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             Mode = CipherMode.CBC
         };
 
-        private static int DefaultChunkSize => 1024 * 1024 * 4;
+        private static int DefaultChunkSize => 1024 * 4;
 
         /// <inheritdoc />
         /// <summary>
-        /// The default constructor which uses 4mb of memory and uses TripleDESCng
+        /// The default constructor which uses 4kb of memory and uses TripleDESCng
         /// </summary>
         public TripleDesCryptoManager() : this(DefaultChunkSize)
         {
@@ -90,7 +90,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
 
         /// <inheritdoc />
         /// <summary>
-        /// Uses 4mb read/write values and a TripleDES algorithm of your choice
+        /// Uses 4kb read/write values and a TripleDES algorithm of your choice
         /// </summary>
         /// <param name="algorithm">The algorithm to use</param>
         public TripleDesCryptoManager([NotNull] SymmetricAlgorithm algorithm) : this(DefaultChunkSize, algorithm)
@@ -105,6 +105,8 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// <param name="algorithm">The algorithm to use</param>
         public TripleDesCryptoManager(int memoryConst, [NotNull] SymmetricAlgorithm algorithm) : base(memoryConst, algorithm)
         {
+            this.KeySize = null;
+
             // Check if the algorithm is part of the 2 .NET algorithms currently FIPS compliant
             if (algorithm is AesCng || algorithm is AesCryptoServiceProvider || algorithm is TripleDESCng)
             {
@@ -134,7 +136,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             if (iv == null)
                 iv = this.InitializationVector ?? throw new ArgumentNullException(nameof(this.InitializationVector));
 
-            if (key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + "must be the length of KeySize - " + KeySize + " bits");
+            if (KeySize.HasValue && KeySize.HasValue && key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + " must be the length of KeySize - " + KeySize + " bits");
 
             if (this.InitializationVector.Length * 8 < this.SymmetricAlgorithm.BlockSize)
                 throw new ArgumentException("Initialization vector set in class must be at least as many bits as the block size");
@@ -175,7 +177,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             if (iv == null)
                 iv = this.InitializationVector ?? throw new ArgumentNullException(nameof(this.InitializationVector));
 
-            if (key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + "must be the length of KeySize - " + KeySize + " bits");
+            if (KeySize.HasValue && key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + " must be the length of KeySize - " + KeySize + " bits");
 
             if (this.InitializationVector.Length * 8 < this.SymmetricAlgorithm.BlockSize)
                 throw new ArgumentException("Initialization vector set in class must be at least as many bits as the block size");
@@ -215,7 +217,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             if (iv == null)
                 iv = this.InitializationVector ?? throw new ArgumentNullException(nameof(this.InitializationVector));
 
-            if (key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + "must be the length of KeySize - " + KeySize + " bits");
+            if (KeySize.HasValue && key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + " must be the length of KeySize - " + KeySize + " bits");
 
             if (this.InitializationVector.Length * 8 < this.SymmetricAlgorithm.BlockSize)
                 throw new ArgumentException("Initialization vector set in class must be at least as many bits as the block size");
@@ -261,7 +263,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             if (iv == null)
                 iv = this.InitializationVector ?? throw new ArgumentNullException(nameof(this.InitializationVector));
 
-            if (key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + "must be the length of KeySize - " + KeySize + " bits");
+            if (KeySize.HasValue && key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + " must be the length of KeySize - " + KeySize + " bits");
 
             if (this.InitializationVector.Length * 8 < this.SymmetricAlgorithm.BlockSize)
                 throw new ArgumentException("Initialization vector set in class must be at least as many bits as the block size");

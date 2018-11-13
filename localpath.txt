@@ -1,0 +1,19 @@
+﻿BEGIN ENCRYPTION HEADER STRING{
+  "HmacRepresentative": {
+    "HashBytes": "AQID",
+    "HashAlgorithm": "System.Security.Cryptography.HMACMD5, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+  },
+  "TransformationModeInfo": {
+    "CryptoManager": "FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric.AesCryptoManager, CryptoTools, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "InitializationVector": "AQID",
+    "CipherMode": 5,
+    "KeySize": 128,
+    "BlockSize": 128,
+    "PaddingMode": 2
+  },
+  "InstanceKeyCreator": {
+    "KeyAlgorithm": "FactaLogicaSoftware.CryptoTools.Digests.KeyDerivation.Pbkdf2KeyDerive, CryptoTools, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "PerformanceDerivative": 128,
+    "Salt": "AQID"
+  }
+}END ENCRYPTION HEADER STRING

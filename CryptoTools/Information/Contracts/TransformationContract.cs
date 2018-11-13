@@ -10,7 +10,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
     /// including an optional HMAC and key derivation
     /// contract
     /// </summary>
-    public class TransformationContract
+    public struct TransformationContract
     {
         /// <summary>
         /// 
