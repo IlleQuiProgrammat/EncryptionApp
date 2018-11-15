@@ -10,7 +10,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
     /// The representation of a specific HMAC
     /// verification
     /// </summary>
-    public struct HmacRepresentative : IEquatable<HmacRepresentative>
+    public readonly struct HmacRepresentative : IEquatable<HmacRepresentative>
     {
         /// <summary>
         /// The default constructor for this immutable object

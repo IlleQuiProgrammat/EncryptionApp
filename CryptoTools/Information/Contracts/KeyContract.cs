@@ -8,7 +8,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
     /// The contract for deriving a key
     /// in a specific way
     /// </summary>
-    public struct KeyContract
+    public readonly struct KeyContract
     {
         /// <summary>
         /// The constructor for this immutable
@@ -30,19 +30,18 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
         /// <summary>
         /// The type used to derive the key
         /// </summary>
-        [NotNull]
-        public Type KeyAlgorithm { get;  }
+        [NotNull] public readonly Type KeyAlgorithm;
 
         /// <summary>
         /// The performance derivative used to generate it
         /// (See FactaLogicaSoftware.CryptoTools.PerformanceInterop)
         /// </summary>
         /// <see cref="FactaLogicaSoftware.CryptoTools.PerformanceInterop"/>
-        public ulong PerformanceDerivative { get; }
+        public readonly ulong PerformanceDerivative;
 
         /// <summary>
         /// The number of bytes of salt used
         /// </summary>
-        public uint SaltLengthBytes { get; }
+        public readonly uint SaltLengthBytes;
     }
 }

@@ -10,39 +10,39 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
     /// The information representing a piece
     /// of encrypted data
     /// </summary>
-    public struct TransformationRepresentative : IEquatable<TransformationRepresentative>
+    public readonly struct TransformationRepresentative : IEquatable<TransformationRepresentative>
     {
         /// <summary>
         /// The CryptoManager used for transformation
         /// </summary>
         [NotNull]
-        public Type CryptoManager { get; }
+        public readonly Type CryptoManager;
 
         /// <summary>
         /// The initialization vector
         /// </summary>
         [NotNull]
-        public byte[] InitializationVector { get; }
+        public readonly byte[] InitializationVector;
 
         /// <summary>
         /// The CipherMode used
         /// </summary>
-        public CipherMode CipherMode { get; }
+        public readonly CipherMode CipherMode;
 
         /// <summary>
         /// The key size, in bits, used
         /// </summary>
-        public uint KeySize { get; }
+        public readonly uint KeySize;
 
         /// <summary>
         /// The block size, in bits, used
         /// </summary>
-        public uint BlockSize { get; }
+        public readonly uint BlockSize;
 
         /// <summary>
         /// The padding mode used
         /// </summary>
-        public PaddingMode PaddingMode { get; }
+        public readonly PaddingMode PaddingMode;
 
         /// <summary>
         /// The constructor for this

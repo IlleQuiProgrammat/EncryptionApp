@@ -10,7 +10,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
     /// The representation of how the key
     /// was derived for a specific transformation
     /// </summary>
-    public struct KeyRepresentative : IEquatable<KeyRepresentative>
+    public readonly struct KeyRepresentative : IEquatable<KeyRepresentative>
     {
         /// <inheritdoc cref="ValueType" />
         public bool Equals(KeyRepresentative other)

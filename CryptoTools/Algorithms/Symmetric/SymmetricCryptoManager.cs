@@ -45,7 +45,12 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// <summary>
         /// The key size, in bits, to use
         /// </summary>
-        public abstract int? KeySize { get; set; }
+        public abstract int KeySize { get; set; }
+
+        /// <summary>
+        /// The initialization vector used for transformation
+        /// </summary>
+        public abstract byte[] InitializationVector { get; set; }
 
         /// <summary>
         /// Whether the current SymmetricAlgorithm is FIPS 140-2 compliant
@@ -87,6 +92,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             handler?.Invoke(this, e);
         }
 
+#if DEBUG
         /// <summary>
         /// The event handler for debug values being finalised
         /// </summary>
@@ -97,6 +103,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             EventHandler<DebugValuesFinalisedEventArgs> handler = this.DebugValuesFinalised;
             handler?.Invoke(this, e);
         }
+#endif
 
         /// <summary>
         /// Generates a secure sequence of random numbers

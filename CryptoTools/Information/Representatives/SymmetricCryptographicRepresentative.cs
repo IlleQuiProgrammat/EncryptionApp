@@ -13,7 +13,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
     /// including all unique instances, unlike a
     /// SymmetricCryptographicContract
     /// </summary>
-    public class SymmetricCryptographicRepresentative : CryptographicRepresentative, IEquatable<SymmetricCryptographicRepresentative>
+    public sealed class SymmetricCryptographicRepresentative : CryptographicRepresentative, IEquatable<SymmetricCryptographicRepresentative> // Don't unseal
     {
         /// <summary>
         /// The constructor used for reading
@@ -22,6 +22,16 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
         {
             this.Type = InfoType.Read;
             this.Encoding = Encoding.UTF8;
+        }
+        /// <summary>
+        /// The constructor used for reading,
+        /// taking the file path to read the values from
+        /// </summary>
+        public SymmetricCryptographicRepresentative(string filePath)
+        {
+            this.Type = InfoType.Read;
+            this.Encoding = Encoding.UTF8;
+            this.ReadHeaderFromFile(filePath);
         }
 
         /// <summary>
@@ -250,7 +260,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
         public static bool operator ==(SymmetricCryptographicRepresentative left,
             SymmetricCryptographicRepresentative right)
         {
-            return left != null && left.Equals(right);
+            return left?.Equals(right) ?? false;
         }
 
         /// <inheritdoc cref="IEquatable{T}"/>

@@ -151,8 +151,9 @@ namespace Encryption_App
             var encryptor =
                 (SymmetricCryptoManager)Activator.CreateInstance(request.Contract.TransformationContract.CryptoManager,
                     @params);
-
+#if DEBUG
             encryptor.DebugValuesFinalised += Encryptor_OnDebugValuesFinalised;
+#endif
 
 #if VERBOSE
             long offset = watch.ElapsedMilliseconds;
@@ -285,8 +286,9 @@ namespace Encryption_App
             var encryptor =
                 (SymmetricCryptoManager)Activator.CreateInstance(request.Contract.TransformationContract.CryptoManager,
                     @params);
-
+#if DEBUG
             encryptor.DebugValuesFinalised += Encryptor_OnDebugValuesFinalised;
+#endif
 
 #if VERBOSE
             long offset = watch.ElapsedMilliseconds;
@@ -570,6 +572,7 @@ namespace Encryption_App
             }
         }
 
+#if DEBUG
         private static void Encryptor_OnDebugValuesFinalised(object sender, DebugValuesFinalisedEventArgs e)
         {
             try
@@ -581,5 +584,6 @@ namespace Encryption_App
                 MessageBox.Show($"Unable to log values - IO exception occured with message: {exception.Message}");
             }
         }
+#endif
     }
 }

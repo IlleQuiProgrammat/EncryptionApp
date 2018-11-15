@@ -7,7 +7,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
     /// The contract for creation of an HMAC
     /// message authenticator
     /// </summary>
-    public struct HmacContract
+    public readonly struct HmacContract
     {
         /// <summary>
         /// The constructor for this immutable
@@ -26,6 +26,6 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
         /// The type used to generate the HMAC
         /// </summary>
         [NotNull]
-        public Type HashAlgorithm { get; }
+        public readonly Type HashAlgorithm;
     }
 }

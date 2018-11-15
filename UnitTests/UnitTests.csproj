@@ -91,7 +91,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CryptoTests\AesUnitTests.cs" />
+    <Compile Include="CryptoTests\HmacUnitTests.cs" />
+    <Compile Include="CryptoTests\SymmetricEncryptionUnitTest.cs" />
+    <Compile Include="CryptoTests\CryptographicRepresentativesUnitTests.cs" />
     <Compile Include="MiscTests\MiscTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
