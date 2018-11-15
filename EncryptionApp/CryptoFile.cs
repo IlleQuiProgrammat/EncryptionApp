@@ -197,14 +197,12 @@ namespace Encryption_App
                                         ? new HmacRepresentative(request.Contract.HmacContract.Value.HashAlgorithm, hash)
                                         : (HmacRepresentative?)null;
 
-            KeyRepresentative? keyRepresentative = request.Contract.InstanceKeyContract.HasValue
-                ? new KeyRepresentative
-                (
-                    request.Contract.InstanceKeyContract.Value.KeyAlgorithm,
-                    request.Contract.InstanceKeyContract.Value.PerformanceDerivative,
-                    salt
-                )
-                : (KeyRepresentative?)null;
+            KeyRepresentative? keyRepresentative = new KeyRepresentative
+            (
+                request.Contract.InstanceKeyContract.Value.KeyAlgorithm,
+                request.Contract.InstanceKeyContract.Value.PerformanceDerivative,
+                salt
+            );
 
             // Delete the key from memory for security
             Externals.ZeroMemory(keyHandle.AddrOfPinnedObject(), key.Length);
