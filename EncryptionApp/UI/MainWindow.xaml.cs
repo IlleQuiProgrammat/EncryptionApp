@@ -88,6 +88,7 @@ namespace Encryption_App.UI
             this.EncryptDropDown.SelectionChanged += ResolveKeySizes;
             this.HmacDropDown.ItemsSource = this._encryptHmacDropDownItems;
             this.KeyDeriveDropDown.ItemsSource = this._encryptKeyDeriveDropDownItems;
+            ResolveKeySizes(null, null); // hack-y
             this.EncryptDropDown.Text = this.EncryptDropDown.ItemsSource.Cast<string>().ToList()[0];
             this.HmacDropDown.Text = this.HmacDropDown.ItemsSource.Cast<string>().ToList()[0];
             this.KeyDeriveDropDown.Text = this.KeyDeriveDropDown.ItemsSource.Cast<string>().ToList()[0];
@@ -150,7 +151,7 @@ namespace Encryption_App.UI
 
         private void ResolveKeySizes(object sender, SelectionChangedEventArgs e)
         {
-            switch ((string)this.EncryptDropDown.SelectionBoxItem)
+            switch ((string)e?.AddedItems[0] ?? this.EncryptDropDown.SelectionBoxItem)
             {
                 case AesStringChoice:
                     this.KeySizeDropDown.ItemsSource = AesCryptoManager.KeySizes;
@@ -170,7 +171,7 @@ namespace Encryption_App.UI
             }
 
             this.KeySizeDropDown.SelectedIndex = 0;
-            this.KeySizeDropDown.Text = this.KeySizeDropDown.ItemsSource.Cast<string>().ToList()[0];
+            this.KeySizeDropDown.Text = this.KeySizeDropDown.ItemsSource.Cast<int>().ToList()[0].ToString();
         }
 
         private void MainWindow_DecryptionProgressChanged(object sender, int e)

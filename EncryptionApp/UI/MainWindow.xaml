@@ -114,6 +114,7 @@
         Name="ContentSite"
         IsHitTestVisible="False" 
         Margin="3,3,23,3"
+                                Content="{TemplateBinding ComboBox.SelectionBoxItem}" ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
         VerticalAlignment="Center"
         HorizontalAlignment="Left" />
                             <TextBox x:Name="PART_EditableTextBox"
@@ -165,7 +166,7 @@
             <ColumnDefinition Width="0*" />
         </Grid.ColumnDefinitions>
 
-        <TabControl x:Name="TabControl" HorizontalAlignment="Left" Height="397" VerticalAlignment="Top" Width="796" Margin="0,24,-410,0" Foreground="White" Grid.ColumnSpan="2">
+        <TabControl x:Name="TabControl" HorizontalAlignment="Left"  Height="397" VerticalAlignment="Top" Width="796" Margin="0,24,-410,0" Foreground="White" Grid.ColumnSpan="2">
             <TabItem x:Name="EncryptionTab" Header="Encryption" Background="#FF606060" Foreground="White" FontFamily="Segoe UI Light" BorderBrush="#FF707070" FontSize="15">
 
                 <Grid Margin="-6,-3,405,-5">
