@@ -10,7 +10,10 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
     /// <inheritdoc />
     public sealed class AesCryptoManager : SymmetricCryptoManager
     {
-        private static readonly int[] KeySizes = { 128, 192, 256 };
+        /// <summary>
+        /// The valid key sizes for this algorithm
+        /// </summary>
+        public static readonly int[] KeySizes = { 128, 192, 256 };
 
         private byte[] _initializationVector;
 

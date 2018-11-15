@@ -12,7 +12,10 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
     public sealed class TripleDesCryptoManager : SymmetricCryptoManager
     {
         // TODO check if 128 bits is supported
-        private static readonly int[] KeySizes = { 192 };
+        /// <summary>
+        /// The valid key sizes for this algorithm
+        /// </summary>
+        public static readonly int[] KeySizes = { 192 };
 
         private byte[] _initializationVector;
 

@@ -15,7 +15,10 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
     public sealed class Rc2CryptoManager : SymmetricCryptoManager
     {
         // TODO 4- 128 bits in 8 bit increments
-        private static readonly int[] KeySizes = { 128 };
+        /// <summary>
+        /// The valid key sizes for this algorithm
+        /// </summary>
+        public static readonly int[] KeySizes = { 128 };
 
         private byte[] _initializationVector;
 

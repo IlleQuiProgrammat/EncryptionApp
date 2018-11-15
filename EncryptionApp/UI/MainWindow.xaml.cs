@@ -11,12 +11,10 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Xaml;
-
-#if VERBOSE
-#endif
 
 namespace Encryption_App.UI
 {
@@ -28,16 +26,26 @@ namespace Encryption_App.UI
     {
         #region FIELDS
 
-        // No they can't - dynamic keyword messes up ReSharper and Intellisense
-        // ReSharper disable twice PrivateFieldCanBeConvertedToLocalVariable
-        // ReSharper disable twice NotAccessedField.Local
         private const int DesiredKeyDerivationMilliseconds = 2000;
 
         private const int KeySize = 128;
         private const string AesStringChoice = "AES - Recommended";
         private const string TripleDesStringChoice = "TripleDES";
         private const string Rc2StringChoice = "Rc2";
-        private readonly List<string> _dropDownItems = new List<string> { AesStringChoice, TripleDesStringChoice, Rc2StringChoice };
+        private const string NoHmacChoice = "No HMAC";
+        private const string HmacSha256Choice = "SHA256";
+        private const string HmacSha384Choice = "SHA384 (Recommended)";
+        private const string HmacSha512Choice = "SHA512";
+        private const string HmacMd5Choice = "Md5 (Not recommended)";
+        private const string HmacRipeMd160Choice = "RIPEMD160 (Not recommended)";
+        private const string HmacSha1Choice = "SHA1 (Not recommended)";
+        private const string Pbkdf2Choice = "PBKDF2";
+        private const string Pbkdf2CustomChoice = "PBKDF2 - custom, quicker, implementation - not security checked";
+        private const string ScryptChoice = "SCrypt";
+        private const string Argon2Choice = "Argon2Choice";
+        private readonly List<string> _encryptAlgorithmDropDownItems = new List<string> { AesStringChoice, TripleDesStringChoice, Rc2StringChoice };
+        private readonly List<string> _encryptHmacDropDownItems = new List<string> { HmacSha384Choice, HmacSha512Choice, HmacSha256Choice, HmacMd5Choice, HmacRipeMd160Choice, NoHmacChoice };
+        private readonly List<string> _encryptKeyDeriveDropDownItems = new List<string> { Pbkdf2Choice, Pbkdf2Choice, Argon2Choice, ScryptChoice };
         private readonly Progress<int> _encryptionProgress;
         private readonly Progress<int> _decryptionProgress;
         private bool _isExecutingExclusiveProcess;
@@ -76,8 +84,13 @@ namespace Encryption_App.UI
 #endif
 
             // Initialize objects
-            this.DropDown.ItemsSource = this._dropDownItems;
-            this.DropDown.SelectedIndex = 0;
+            this.EncryptDropDown.ItemsSource = this._encryptAlgorithmDropDownItems;
+            this.EncryptDropDown.SelectionChanged += ResolveKeySizes;
+            this.HmacDropDown.ItemsSource = this._encryptHmacDropDownItems;
+            this.KeyDeriveDropDown.ItemsSource = this._encryptKeyDeriveDropDownItems;
+            this.EncryptDropDown.Text = this.EncryptDropDown.ItemsSource.Cast<string>().ToList()[0];
+            this.HmacDropDown.Text = this.HmacDropDown.ItemsSource.Cast<string>().ToList()[0];
+            this.KeyDeriveDropDown.Text = this.KeyDeriveDropDown.ItemsSource.Cast<string>().ToList()[0];
             this._isExecutingExclusiveProcess = false;
             this._cache = new Queue<(object sender, RoutedEventArgs e, RequestStateRecord record)>();
             this.EncryptionCacheStateSwitchButton.Content = "Pause cache";
@@ -116,6 +129,49 @@ namespace Encryption_App.UI
         #endregion CONSTRUCTORS
 
         #region EVENT_HANDLERS
+
+        private void CacheStateSwitchButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            this._cacheExecutionState = !this._cacheExecutionState;
+
+            ((Button)sender).Content = this._cacheExecutionState
+                ? PrimaryResources.CacheRunning_String
+                : PrimaryResources.CachePaused_String;
+
+            if (this._cacheExecutionState && !this._isCacheRunning)
+            {
+                ManageCache();
+            }
+            else
+            {
+                this._isCacheRequested = true;
+            }
+        }
+
+        private void ResolveKeySizes(object sender, SelectionChangedEventArgs e)
+        {
+            switch ((string)this.EncryptDropDown.SelectionBoxItem)
+            {
+                case AesStringChoice:
+                    this.KeySizeDropDown.ItemsSource = AesCryptoManager.KeySizes;
+                    break;
+
+                case TripleDesStringChoice:
+                    this.KeySizeDropDown.ItemsSource = TripleDesCryptoManager.KeySizes;
+                    break;
+
+                case Rc2StringChoice:
+                    this.KeySizeDropDown.ItemsSource = Rc2CryptoManager.KeySizes;
+                    break;
+
+                default:
+                    MessageBox.Show("Algorithm dropdown selected changed. Please restore it to original, and continue");
+                    return;
+            }
+
+            this.KeySizeDropDown.SelectedIndex = 0;
+            this.KeySizeDropDown.Text = this.KeySizeDropDown.ItemsSource.Cast<string>().ToList()[0];
+        }
 
         private void MainWindow_DecryptionProgressChanged(object sender, int e)
         {
@@ -175,13 +231,14 @@ namespace Encryption_App.UI
                     throw new ExternalException("Directory box failed to open");
             }
         }
-
-        // TODO Make values dependent on settings @NightRaven3142
+        
         private async void Encrypt_Click(object sender, RoutedEventArgs e)
         {
             Type typeOfTransform;
+            Type typeOfHmac;
+            Type typeOfKeyDerive;
 
-            switch ((string)this.DropDown.SelectionBoxItem)
+            switch ((string)this.EncryptDropDown.SelectionBoxItem)
             {
                 case AesStringChoice:
                     typeOfTransform = typeof(AesCryptoManager);
@@ -196,14 +253,62 @@ namespace Encryption_App.UI
                     break;
 
                 default:
-                    MessageBox.Show("Dropdown selected changed. Please restore it to original, and continue");
+                    MessageBox.Show("Algorithm dropdown selected changed. Please restore it to original, and continue");
+                    return;
+            }
+
+            switch ((string) this.HmacDropDown.SelectionBoxItem)
+            {
+                case HmacSha384Choice:
+                    typeOfHmac = typeof(HMACSHA384);
+                    break;
+                case HmacSha256Choice:
+                    typeOfHmac = typeof(HMACSHA256);
+                    break;
+                case HmacSha512Choice:
+                    typeOfHmac = typeof(HMACSHA512);
+                    break;
+                case HmacMd5Choice:
+                    typeOfHmac = typeof(HMACMD5);
+                    break;
+                case HmacRipeMd160Choice:
+                    typeOfHmac = typeof(HMACRIPEMD160);
+                    break;
+                case HmacSha1Choice:
+                    typeOfHmac = typeof(HMACSHA1);
+                    break;
+                case NoHmacChoice:
+                    typeOfHmac = null;
+                    break;
+                default:
+                    MessageBox.Show("HMAC dropdown selected changed. Please restore it to original, and continue");
+                    return;
+            }
+
+            switch ((string)this.KeyDeriveDropDown.SelectionBoxItem)
+            {
+                case Pbkdf2Choice:
+                    typeOfKeyDerive = typeof(Pbkdf2KeyDerive);
+                    break;
+                case Pbkdf2CustomChoice:
+                    typeOfKeyDerive = typeof(Pbkdf2KeyDerive);
+                    break;
+                case Argon2Choice:
+                    typeOfKeyDerive = typeof(Argon2KeyDerive);
+                    break;
+                case ScryptChoice:
+                    typeOfKeyDerive = typeof(Pbkdf2KeyDerive);
+                    break;
+                default:
+                    MessageBox.Show("Key derive algorithm dropdown selected changed. Please restore it to original, and continue");
                     return;
             }
 
             var contract = new SymmetricCryptographicContract
             (
-                new TransformationContract(typeOfTransform, 16, CipherMode.CBC, PaddingMode.PKCS7, KeySize, 128),
-                new KeyContract(typeof(Pbkdf2KeyDerive), App.This.PerformanceDerivative.PerformanceDerivativeValue, 16)
+                new TransformationContract(typeOfTransform, 16, CipherMode.CBC, PaddingMode.PKCS7, uint.Parse((string)this.KeySizeDropDown.SelectionBoxItem), 128),
+                new KeyContract(typeOfKeyDerive, App.This.PerformanceDerivative.PerformanceDerivativeValue, 16),
+                typeOfHmac == null ? null : new HmacContract?(new HmacContract(typeOfHmac))
             );
 
             var record = new RequestStateRecord(ProcessType.Encryption, this.EncryptFileTextBox.Text, contract);
@@ -476,23 +581,5 @@ namespace Encryption_App.UI
         }
 
         #endregion METHODS
-
-        private void CacheStateSwitchButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            this._cacheExecutionState = !this._cacheExecutionState;
-
-            ((Button)sender).Content = this._cacheExecutionState
-                ? PrimaryResources.CacheRunning_String
-                : PrimaryResources.CachePaused_String;
-
-            if (this._cacheExecutionState && !this._isCacheRunning)
-            {
-                ManageCache();
-            }
-            else
-            {
-                this._isCacheRequested = true;
-            }
-        }
     }
 }

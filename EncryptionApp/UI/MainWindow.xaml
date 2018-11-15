@@ -57,6 +57,103 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <LinearGradientBrush x:Key="NormalBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientBrush.GradientStops>
+                <GradientStopCollection>
+                    <GradientStop Color="#FF707070" Offset="0.0"/>
+                    <GradientStop Color="#FF707070" Offset="1.0"/>
+                </GradientStopCollection>
+            </GradientBrush.GradientStops>
+        </LinearGradientBrush>
+
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FF707070" />
+
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="ToggleButton">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="20" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="Border" Grid.ColumnSpan="2" CornerRadius="2"
+  Background="{StaticResource NormalBrush}"
+  BorderThickness="1" />
+                <Border 
+  Grid.Column="0"
+  CornerRadius="2,0,0,2" 
+  Margin="1" 
+  Background="{StaticResource WindowBackgroundBrush}" 
+  BorderThickness="0,0,1,0" />
+                <Path 
+  x:Name="Arrow"
+  Grid.Column="1"     
+  HorizontalAlignment="Center"
+  VerticalAlignment="Center"
+  Data="M 0 0 L 4 4 L 8 0 Z"/>
+            </Grid>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="TextBox">
+            <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
+        </ControlTemplate>
+
+
+        <Style x:Key="{x:Type ComboBox}" TargetType="ComboBox">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <ToggleButton 
+         Name="ToggleButton" 
+         Template="{StaticResource ComboBoxToggleButton}" 
+         Grid.Column="0" 
+         Focusable="false"
+         IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+         ClickMode="Press">
+                            </ToggleButton>
+                            <ContentPresenter
+        Name="ContentSite"
+        IsHitTestVisible="False" 
+        Margin="3,3,23,3"
+        VerticalAlignment="Center"
+        HorizontalAlignment="Left" />
+                            <TextBox x:Name="PART_EditableTextBox"
+         Style="{x:Null}" 
+         Template="{StaticResource ComboBoxTextBox}" 
+         HorizontalAlignment="Left" 
+         VerticalAlignment="Center" 
+         Margin="3,3,23,3"
+         Focusable="True" 
+         Background="Transparent"
+         Visibility="Hidden"
+         IsReadOnly="{TemplateBinding IsReadOnly}"/>
+                            <Popup 
+        Name="Popup"
+        Placement="Bottom"
+        IsOpen="{TemplateBinding IsDropDownOpen}"
+        AllowsTransparency="True" 
+        Focusable="False"
+        PopupAnimation="Slide">
+                                <Grid 
+          Name="DropDown"
+          SnapsToDevicePixels="True"                
+          MinWidth="{TemplateBinding ActualWidth}"
+          MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border 
+            x:Name="DropDownBorder"
+            Background="{StaticResource WindowBackgroundBrush}"
+            BorderThickness="1"/>
+                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Window.Background>
@@ -79,7 +176,25 @@
                         <ColumnDefinition Width="91*" />
                         <ColumnDefinition Width="290*" />
                     </Grid.ColumnDefinitions>
-                    <ComboBox HorizontalAlignment="Left"  Margin="26,54,0,0" VerticalAlignment="Top" Width="297" Height="23" x:Name="DropDown" Grid.ColumnSpan="2" Foreground="White" Background="#FF707070" FontFamily="Segoe UI Light" FontSize="12">
+                    <ComboBox HorizontalAlignment="Left" SelectedIndex="0" Margin="27,26,0,0" VerticalAlignment="Top" Width="297" Height="23" x:Name="EncryptDropDown" Grid.ColumnSpan="2" Foreground="White" Background="#FF707070" FontFamily="Segoe UI Light" FontSize="12">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="ComboBoxItem">
+                                <Setter Property="Background" Value="#FF424242" />
+                                <Setter Property="BorderThickness" Value="0" />
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                    </ComboBox>
+                    <ComboBox HorizontalAlignment="Left" SelectedIndex="0" Margin="26,82,0,0" VerticalAlignment="Top" Width="297" Height="23" x:Name="HmacDropDown" Grid.ColumnSpan="2"
+                              Grid.Column="0" Foreground="White" Background="#FF707070" FontFamily="Segoe UI Light" FontSize="12">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="ComboBoxItem">
+                                <Setter Property="Background" Value="#FF424242" />
+                                <Setter Property="BorderThickness" Value="0" />
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                    </ComboBox>
+                    <ComboBox HorizontalAlignment="Left" SelectedIndex="0" Margin="27,54,0,0" VerticalAlignment="Top" Width="297" Height="23" x:Name="KeyDeriveDropDown" Grid.ColumnSpan="2"
+                              Grid.Column="0" Foreground="White" Background="#FF707070" FontFamily="Segoe UI Light" FontSize="12">
                         <ComboBox.ItemContainerStyle>
                             <Style TargetType="ComboBoxItem">
                                 <Setter Property="Background" Value="#FF424242" />
@@ -96,8 +211,17 @@
                     <Label Content="Enter password:" HorizontalAlignment="Left" Margin="26,112,0,0" VerticalAlignment="Top" Width="122" Grid.ColumnSpan="2" FontFamily="Segoe UI Light" FontSize="15" Foreground="White" />
                     <Image x:Name="EncryptLoadingGif" gif:ImageBehavior.AnimatedSource="/UI/Assets/loading.gif" gif:ImageBehavior.RepeatBehavior="Forever" Margin="10,302,32,12" />
                     <Label Content="File Location:" HorizontalAlignment="Left"  Margin="26,184,0,0" VerticalAlignment="Top" Width="162" Grid.ColumnSpan="2" FontSize="15" Foreground="White" FontFamily="Segoe UI Light" />
-                    <PasswordBox HorizontalAlignment="Left" FontSize="15" Foreground="White" Margin="26,147,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2" Width="297" Height="23" Background="#FF424242" BorderBrush="#FF707070" x:Name="EncryptPasswordBox" />
+                    <PasswordBox HorizontalAlignment="Left" FontSize="15" Foreground="White" Margin="26,147,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"
+                                 Grid.Column="0" Width="297" Height="23" Background="#FF424242" BorderBrush="#FF707070" x:Name="EncryptPasswordBox" />
                     <ProgressBar x:Name="EncryptProgressBar" Grid.Column="1" HorizontalAlignment="Left" Height="10" Margin="50,302,0,0" VerticalAlignment="Top" Width="100" />
+                    <ComboBox HorizontalAlignment="Left"  Margin="236,26,0,0" VerticalAlignment="Top" Width="52" Height="23" x:Name="KeySizeDropDown" Foreground="White" Background="#FF707070" FontFamily="Segoe UI Light" FontSize="12" Grid.Column="1" IsReadOnly="True">
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ComboBoxItem}">
+                                <Setter Property="Background" Value="#FF424242" />
+                                <Setter Property="BorderThickness" Value="0" />
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                    </ComboBox>
                 </Grid>
             </TabItem>
             <TabItem x:Name="DecryptionTab" Header="Decryption" Background="#FF606060" Foreground="White" FontFamily="Segoe UI Light" BorderBrush="#FF707070" FontSize="15">
