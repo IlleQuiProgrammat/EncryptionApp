@@ -21,34 +21,10 @@
         public static void AppendToFile(string startFile, string endFile)
         {
             // Create streams to read from the temporary file with the encrypted data to the file with the header
-            using (var reader = new BinaryReader(File.OpenRead(endFile)))
-            using (var writer = new BinaryWriter(new FileStream(startFile, FileMode.Append))
-            )
+            using (var reader = new FileStream(endFile, FileMode.Open))
+            using (var writer = new FileStream(startFile, FileMode.Append))
             {
-                // IMPORTANT, FileMode.Append is used to not overwrite the header
-                long length = reader.BaseStream.Length;
-
-                // Continuously reads the stream in 1 mb sections until there is none left
-                while (true)
-                {
-                    if (length < 1024 * 1024 * 1024)
-                    {
-                        // Read all bytes into the array and write them
-                        var buff = new byte[length];
-                        int read = reader.Read(buff, 0, buff.Length);
-                        writer.Write(buff, 0, read);
-
-                        break;
-                    }
-                    else
-                    {
-                        // Read as many bytes as we allow into the array from the file and write them
-                        var buff = new byte[1024 * 1024 * 1024];
-                        int read = reader.Read(buff, 0, buff.Length);
-                        writer.Write(buff, 0, read);
-                        length -= read;
-                    }
-                }
+                reader.CopyTo(writer);
             }
         }
 
