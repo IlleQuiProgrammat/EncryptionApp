@@ -69,7 +69,7 @@ namespace Encryption_App.UI
             {
                 InitializeComponent();
             }
-            catch (XamlParseException e)
+            catch (Exception e)
             {
                 // If this happens, the XAML was invalid at runtime. We aren't
                 // trying to fix this, just write the exceptions to log
@@ -221,11 +221,9 @@ namespace Encryption_App.UI
                 case true when ((FrameworkElement)e.Source).Name == this.EncryptFileBrowseButton.Name:
                     this.EncryptFileTextBox.Text = openFileDialog.FileName;
                     break;
-
                 case true when ((FrameworkElement)e.Source).Name == this.DecryptFileBrowseButton.Name:
                     this.DecryptFileTextBox.Text = openFileDialog.FileName;
                     break;
-                // If it fails, something's gone wrong. TODO catch
                 case true:
                     throw new XamlException("Invalid caller");
                 case null:

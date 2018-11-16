@@ -6,21 +6,9 @@
         xmlns:local="clr-namespace:Encryption_App.UI"
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="392" ResizeMode="NoResize">
+        Title="MainWindow" Height="450" Width="402" ResizeMode="NoResize">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="DeselectedColour" Color="#FF424242" />
-
-        <SolidColorBrush x:Key="SolidBorderBrush" Color="#FF707070" />
-
-        <SolidColorBrush x:Key="SelectedColour" Color="#FF0288D1" />
-
-        <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="#EEE" />
-
-        <SolidColorBrush x:Key="DisabledBorderBrush" Color="#AAA" />
-
-        <SolidColorBrush x:Key="DisabledForegroundBrush" Color="#FF707070" />
-
         <Style TargetType="{x:Type TabItem}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -29,8 +17,6 @@
                             <Border
                                 Name="Border"
                                 Margin="0,0,-4,0"
-                                Background="{StaticResource DeselectedColour}"
-                                BorderBrush="{StaticResource  SolidBorderBrush}"
                                 BorderThickness="1,1,1,1"
                                 CornerRadius="2,12,0,0">
                                 <ContentPresenter x:Name="ContentSite"
@@ -41,18 +27,6 @@
                                     RecognizesAccessKey="True" />
                             </Border>
                         </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Panel.ZIndex" Value="100" />
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource SelectedColour}" />
-                                <Setter TargetName="Border" Property="BorderThickness" Value="1,1,1,0" />
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Border" Property="Background" Value="{StaticResource DisabledBackgroundBrush}" />
-                                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource DisabledBorderBrush}" />
-                                <Setter Property="Foreground" Value="{StaticResource DisabledForegroundBrush}" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -92,69 +66,7 @@
             </Grid>
         </ControlTemplate>
 
-        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="TextBox">
-            <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
-        </ControlTemplate>
 
-
-        <Style x:Key="{x:Type ComboBox}" TargetType="ComboBox">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ComboBox">
-                        <Grid>
-                            <ToggleButton 
-         Name="ToggleButton" 
-         Template="{StaticResource ComboBoxToggleButton}" 
-         Grid.Column="0" 
-         Focusable="false"
-         IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
-         ClickMode="Press">
-                            </ToggleButton>
-                            <ContentPresenter
-        Name="ContentSite"
-        IsHitTestVisible="False" 
-        Margin="3,3,23,3"
-                                Content="{TemplateBinding ComboBox.SelectionBoxItem}" ContentTemplate="{TemplateBinding ComboBox.SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-        VerticalAlignment="Center"
-        HorizontalAlignment="Left" />
-                            <TextBox x:Name="PART_EditableTextBox"
-         Style="{x:Null}" 
-         Template="{StaticResource ComboBoxTextBox}" 
-         HorizontalAlignment="Left" 
-         VerticalAlignment="Center" 
-         Margin="3,3,23,3"
-         Focusable="True" 
-         Background="Transparent"
-         Visibility="Hidden"
-         IsReadOnly="{TemplateBinding IsReadOnly}"/>
-                            <Popup 
-        Name="Popup"
-        Placement="Bottom"
-        IsOpen="{TemplateBinding IsDropDownOpen}"
-        AllowsTransparency="True" 
-        Focusable="False"
-        PopupAnimation="Slide">
-                                <Grid 
-          Name="DropDown"
-          SnapsToDevicePixels="True"                
-          MinWidth="{TemplateBinding ActualWidth}"
-          MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                                    <Border 
-            x:Name="DropDownBorder"
-            Background="{StaticResource WindowBackgroundBrush}"
-            BorderThickness="1"/>
-                                    <ScrollViewer Margin="4,6,4,6" SnapsToDevicePixels="True">
-                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
-                                    </ScrollViewer>
-                                </Grid>
-                            </Popup>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-            </Style.Triggers>
-        </Style>
     </Window.Resources>
 
     <Window.Background>
@@ -166,7 +78,7 @@
             <ColumnDefinition Width="0*" />
         </Grid.ColumnDefinitions>
 
-        <TabControl x:Name="TabControl" HorizontalAlignment="Left"  Height="397" VerticalAlignment="Top" Width="796" Margin="0,24,-410,0" Foreground="White" Grid.ColumnSpan="2">
+        <TabControl x:Name="TabControl" HorizontalAlignment="Left"  Height="397" VerticalAlignment="Top" Width="796" Margin="0,24,-410,0" Foreground="White" Grid.ColumnSpan="2" RenderTransformOrigin="0.436,0.433">
             <TabItem x:Name="EncryptionTab" Header="Encryption" Background="#FF606060" Foreground="White" FontFamily="Segoe UI Light" BorderBrush="#FF707070" FontSize="15">
 
                 <Grid Margin="-6,-3,405,-5">
