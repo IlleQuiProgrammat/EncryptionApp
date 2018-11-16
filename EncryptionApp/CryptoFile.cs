@@ -1,15 +1,12 @@
 ﻿using Encryption_App.UI;
 using FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric;
 using FactaLogicaSoftware.CryptoTools.Digests.KeyDerivation;
-using FactaLogicaSoftware.CryptoTools.Events;
 using FactaLogicaSoftware.CryptoTools.Exceptions;
 using FactaLogicaSoftware.CryptoTools.HMAC;
 using FactaLogicaSoftware.CryptoTools.Information.Representatives;
 using FactaLogicaSoftware.CryptoTools.PerformanceInterop;
 using System;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Cryptography;
@@ -70,7 +67,7 @@ namespace Encryption_App
         }
 
         /// <summary>
-        ///
+        /// TODO
         /// </summary>
         /// <param name="request"></param>
         /// <param name="password"></param>
@@ -83,9 +80,7 @@ namespace Encryption_App
             ((IProgress<int>)this._progress)?.Report(0);
             password.MakeReadOnly();
 
-#if VERBOSE
-            Stopwatch watch = Stopwatch.StartNew();
-#endif
+
             var salt = new byte[request.Contract.InstanceKeyContract.Value.SaltLengthBytes];
 
             var iv = new byte[request.Contract.TransformationContract.InitializationVectorSizeBytes];
@@ -151,36 +146,22 @@ namespace Encryption_App
             var encryptor =
                 (SymmetricCryptoManager)Activator.CreateInstance(request.Contract.TransformationContract.CryptoManager,
                     @params);
-#if DEBUG
-            encryptor.DebugValuesFinalised += Encryptor_OnDebugValuesFinalised;
-#endif
 
-#if VERBOSE
-            long offset = watch.ElapsedMilliseconds;
-#endif
+
             byte[] key = keyDevice.GetBytes((int)request.Contract.TransformationContract.KeySize / 8);
 
             Externals.ZeroMemory(byteHandle.AddrOfPinnedObject(), ((byte[])byteHandle.Target).Length);
 
             byteHandle.Free();
-#if VERBOSE
-            Console.WriteLine(DebugResources.ActualKeyDerivationTime_WriteString +
-                              (watch.ElapsedMilliseconds - offset));
-            Console.WriteLine(DebugResources.ExpectedKeyDerivationTime_WriteString + desiredKeyDerivationMilliseconds);
-#endif
+
             // Create a handle to the key to allow control of it
             GCHandle keyHandle = GCHandle.Alloc(key, GCHandleType.Pinned);
 
-#if VERBOSE
-            Console.WriteLine(DebugResources.PreEncryptionTime_WriteString + watch.ElapsedMilliseconds);
-#endif
             // Encrypt the data to a temporary file
             encryptor.EncryptFileBytes(this._filePath, App.This.DataTempFile, key, iv);
 
             ((IProgress<int>)this._progress)?.Report(90);
-#if VERBOSE
-            Console.WriteLine(DebugResources.PostEncryptionTime_WriteString + watch.ElapsedMilliseconds);
-#endif
+
 
             byte[] hash = null;
 
@@ -207,9 +188,7 @@ namespace Encryption_App
             // Delete the key from memory for security
             Externals.ZeroMemory(keyHandle.AddrOfPinnedObject(), key.Length);
             keyHandle.Free();
-#if VERBOSE
-            Console.WriteLine(DebugResources.PostHMACCreationTime_WriteString + watch.ElapsedMilliseconds);
-#endif
+
             var cryptographicInfo = new SymmetricCryptographicRepresentative
             (
                 new TransformationRepresentative
@@ -229,16 +208,9 @@ namespace Encryption_App
             cryptographicInfo.WriteHeaderToFile(this._filePath);
 
             ((IProgress<int>)this._progress)?.Report(98);
-#if VERBOSE
-            // We have to use Dispatcher.Invoke as the current thread can't access these objects this.dispatcher.Invoke(() => { EncryptOutput.Content = "Transferring the data to the file"; });
-            Console.WriteLine(DebugResources.PostHeaderWriteTime_WriteString, watch.ElapsedMilliseconds);
-#endif
             FileStatics.AppendToFile(this._filePath, App.This.DataTempFile);
 
             ((IProgress<int>)this._progress)?.Report(100);
-#if VERBOSE
-            Console.WriteLine(DebugResources.FileWriteTime_WriteString + watch.ElapsedMilliseconds);
-#endif
         }
 
         ///  <summary>
@@ -251,10 +223,6 @@ namespace Encryption_App
             int desiredKeyDerivationMilliseconds)
         {
             ((IProgress<int>)this._progress)?.Report(0);
-
-#if VERBOSE
-            Stopwatch watch = Stopwatch.StartNew();
-#endif
 
             var iv = new byte[request.Contract.TransformationContract.InitializationVectorSizeBytes];
             var rng = new RNGCryptoServiceProvider();
@@ -284,31 +252,15 @@ namespace Encryption_App
             var encryptor =
                 (SymmetricCryptoManager)Activator.CreateInstance(request.Contract.TransformationContract.CryptoManager,
                     @params);
-#if DEBUG
-            encryptor.DebugValuesFinalised += Encryptor_OnDebugValuesFinalised;
-#endif
-
-#if VERBOSE
-            long offset = watch.ElapsedMilliseconds;
-#endif
-#if VERBOSE
-            Console.WriteLine(DebugResources.ActualKeyDerivationTime_WriteString +
-                              (watch.ElapsedMilliseconds - offset));
-            Console.WriteLine(DebugResources.ExpectedKeyDerivationTime_WriteString + desiredKeyDerivationMilliseconds);
-#endif
+            
             // Create a handle to the key to allow control of it
             GCHandle keyHandle = GCHandle.Alloc(key, GCHandleType.Pinned);
 
-#if VERBOSE
-            Console.WriteLine(DebugResources.PreEncryptionTime_WriteString + watch.ElapsedMilliseconds);
-#endif
             // Encrypt the data to a temporary file
             encryptor.EncryptFileBytes(this._filePath, App.This.DataTempFile, key, iv);
 
             ((IProgress<int>)this._progress)?.Report(90);
-#if VERBOSE
-            Console.WriteLine(DebugResources.PostEncryptionTime_WriteString + watch.ElapsedMilliseconds);
-#endif
+
 
             byte[] hash = null;
 
@@ -328,9 +280,7 @@ namespace Encryption_App
             // Delete the key from memory for security
             Externals.ZeroMemory(keyHandle.AddrOfPinnedObject(), key.Length);
             keyHandle.Free();
-#if VERBOSE
-            Console.WriteLine(DebugResources.PostHMACCreationTime_WriteString + watch.ElapsedMilliseconds);
-#endif
+
             var cryptographicInfo = new SymmetricCryptographicRepresentative
             (
                 new TransformationRepresentative
@@ -350,16 +300,11 @@ namespace Encryption_App
             cryptographicInfo.WriteHeaderToFile(this._filePath);
 
             ((IProgress<int>)this._progress)?.Report(98);
-#if VERBOSE
-            // We have to use Dispatcher.Invoke as the current thread can't access these objects this.dispatcher.Invoke(() => { EncryptOutput.Content = "Transferring the data to the file"; });
-            Console.WriteLine(DebugResources.PostHeaderWriteTime_WriteString, watch.ElapsedMilliseconds);
-#endif
+
             FileStatics.AppendToFile(this._filePath, App.This.DataTempFile);
 
             ((IProgress<int>)this._progress)?.Report(100);
-#if VERBOSE
-            Console.WriteLine(DebugResources.FileWriteTime_WriteString + watch.ElapsedMilliseconds);
-#endif
+
         }
 
         /// <summary>
@@ -378,9 +323,7 @@ namespace Encryption_App
 
             ((IProgress<int>)this._progress)?.Report(0);
             password.MakeReadOnly();
-#if VERBOSE
-            Stopwatch watch = Stopwatch.StartNew();
-#endif
+
             var performanceDerivative = new PerformanceDerivative(cryptographicRepresentative.InstanceKeyCreator.Value.PerformanceDerivative);
 
             GCHandle byteHandle = SecureStringConverter.SecureStringToKeyDerive(password, cryptographicRepresentative.InstanceKeyCreator.Value.Salt,
@@ -388,9 +331,7 @@ namespace Encryption_App
 
             ((IProgress<int>)this._progress)?.Report(10);
 
-#if VERBOSE
-            Console.WriteLine(DebugResources.PasswordControlledTime__WriteString + watch.ElapsedMilliseconds);
-#endif
+
             HMAC hmacAlg = null;
 
             if (cryptographicRepresentative.HmacRepresentative != null)
@@ -416,9 +357,7 @@ namespace Encryption_App
 
             ((IProgress<int>)this._progress)?.Report(20);
 
-#if VERBOSE
-            Console.WriteLine(DebugResources.HeaderRemovedTime + watch.ElapsedMilliseconds);
-#endif
+
             byte[] key = keyDevice.GetBytes((int)cryptographicRepresentative.TransformationModeInfo.KeySize / 8);
 
             Externals.ZeroMemory(byteHandle.AddrOfPinnedObject(), ((byte[])byteHandle.Target).Length);
@@ -438,10 +377,6 @@ namespace Encryption_App
 
             ((IProgress<int>)this._progress)?.Report(35);
 
-#if VERBOSE
-            Console.WriteLine(DebugResources.PostHMACAuthenticationTime_WriteString + watch.ElapsedMilliseconds);
-#endif
-
             // If that didn't succeed, the file has been tampered with
             if (cryptographicRepresentative.HmacRepresentative != null && !isVerified)
             {
@@ -451,20 +386,13 @@ namespace Encryption_App
             // Try decrypting the remaining data
             try
             {
-#if VERBOSE
-                Console.WriteLine(DebugResources.PreDecryptionTime_WriteString + watch.ElapsedMilliseconds);
-#endif
+
                 decryptor.DecryptFileBytes(App.This.HeaderLessTempFile, App.This.DataTempFile, key, cryptographicRepresentative.TransformationModeInfo.InitializationVector);
-#if VERBOSE
-                ((IProgress<int>)this._progress)?.Report(75);
-                Console.WriteLine(DebugResources.PostDecryptionTime_WriteString + watch.ElapsedMilliseconds);
-#endif
+
                 // Move the file to the original file location
                 File.Copy(App.This.DataTempFile, this._filePath, true);
                 ((IProgress<int>)this._progress)?.Report(100);
-#if VERBOSE
-                Console.WriteLine(DebugResources.FileCopiedTime_WriteString + watch.ElapsedMilliseconds);
-#endif
+
             }
             finally
             {
@@ -483,15 +411,9 @@ namespace Encryption_App
         public void DecryptDataWithHeader([NotNull] SymmetricCryptographicRepresentative cryptographicRepresentative, byte[] key)
         {
             ((IProgress<int>)this._progress)?.Report(0);
-#if VERBOSE
-            Stopwatch watch = Stopwatch.StartNew();
-#endif
 
             ((IProgress<int>)this._progress)?.Report(10);
-
-#if VERBOSE
-            Console.WriteLine(DebugResources.PasswordControlledTime__WriteString + watch.ElapsedMilliseconds);
-#endif
+            
             HMAC hmacAlg = null;
 
             if (cryptographicRepresentative.HmacRepresentative != null)
@@ -517,10 +439,6 @@ namespace Encryption_App
 
             ((IProgress<int>)this._progress)?.Report(20);
 
-#if VERBOSE
-            Console.WriteLine(DebugResources.HeaderRemovedTime + watch.ElapsedMilliseconds);
-#endif
-
             GCHandle keyHandle = GCHandle.Alloc(key, GCHandleType.Pinned);
 
             var isVerified = false;
@@ -534,10 +452,6 @@ namespace Encryption_App
 
             ((IProgress<int>)this._progress)?.Report(35);
 
-#if VERBOSE
-            Console.WriteLine(DebugResources.PostHMACAuthenticationTime_WriteString + watch.ElapsedMilliseconds);
-#endif
-
             // If that didn't succeed, the file has been tampered with
             if (cryptographicRepresentative.HmacRepresentative != null && !isVerified)
             {
@@ -547,20 +461,14 @@ namespace Encryption_App
             // Try decrypting the remaining data
             try
             {
-#if VERBOSE
-                Console.WriteLine(DebugResources.PreDecryptionTime_WriteString + watch.ElapsedMilliseconds);
-#endif
                 decryptor.DecryptFileBytes(App.This.HeaderLessTempFile, App.This.DataTempFile, key, cryptographicRepresentative.TransformationModeInfo.InitializationVector);
-#if VERBOSE
+
                 ((IProgress<int>)this._progress)?.Report(75);
-                Console.WriteLine(DebugResources.PostDecryptionTime_WriteString + watch.ElapsedMilliseconds);
-#endif
+
                 // Move the file to the original file location
                 File.Copy(App.This.DataTempFile, this._filePath, true);
+
                 ((IProgress<int>)this._progress)?.Report(100);
-#if VERBOSE
-                Console.WriteLine(DebugResources.FileCopiedTime_WriteString + watch.ElapsedMilliseconds);
-#endif
             }
             finally
             {
@@ -569,19 +477,5 @@ namespace Encryption_App
                 keyHandle.Free();
             }
         }
-
-#if DEBUG
-        private static void Encryptor_OnDebugValuesFinalised(object sender, DebugValuesFinalisedEventArgs e)
-        {
-            try
-            {
-                FileStatics.WriteToLogFile(e.FinalisedStrings.ToArray<object>()); // little bit of a hack, prevents covariant conversion warning, which is managed in the function
-            }
-            catch (IOException exception)
-            {
-                MessageBox.Show($"Unable to log values - IO exception occured with message: {exception.Message}");
-            }
-        }
-#endif
     }
 }

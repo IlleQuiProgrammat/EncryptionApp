@@ -11,7 +11,7 @@ namespace FactaLogicaSoftware.CryptoTools.DebugTools
     /// </summary>
     public static class InternalDebug
     {
-        private const string TempFilePath = @"CryptoTools\Debug\";
+        private const string LogDirectoryPath = @"CryptoTools\Debug\";
 
         private static readonly object LockForFileExclusivity = new object();
 
@@ -20,27 +20,39 @@ namespace FactaLogicaSoftware.CryptoTools.DebugTools
         /// the diagnostics file
         /// </summary>
         /// <param name="items">The strings to write</param>
-        public static void WriteToDiagnosticsFile(params string[] items)
+        public static void WriteToDiagnosticsFile(params object[] items)
         {
             lock (LockForFileExclusivity)
             {
-                if (!Directory.Exists(TempFilePath))
+                if (!Directory.Exists(LogDirectoryPath))
                 {
-                    Directory.CreateDirectory(TempFilePath);
+                    Directory.CreateDirectory(LogDirectoryPath);
                 }
 
-                if (!File.Exists(TempFilePath + "DiagnosticsAndDebug.data"))
+                if (!File.Exists(LogDirectoryPath + "Log.txt"))
                 {
-                    File.Create(TempFilePath + "DiagnosticsAndDebug.data");
+                    File.Create(LogDirectoryPath + "DiagnosticsAndDebug.data");
                 }
 
-                using (var fWriter = new StreamWriter(
-                    new FileStream(TempFilePath + "DiagnosticsAndDebug.data", FileMode.Append)))
+                using (var fileWriter = new StreamWriter(new FileStream(LogDirectoryPath + "Log.txt", FileMode.Append)))
                 {
-                    fWriter.WriteLine('\n' + DateTime.Now.ToString(CultureInfo.CurrentCulture));
-                    foreach (string item in items)
+                    fileWriter.WriteLine('\n' + DateTime.Now.ToString(CultureInfo.CurrentCulture));
+                    foreach (object item in items)
                     {
-                        fWriter.WriteLine(item);
+                        switch (item)
+                        {
+                            case Exception exceptionCastedItem:
+                                fileWriter.WriteLine("Exception thrown: " + exceptionCastedItem);
+                                break;
+
+                            case string stringCastedItem:
+                                fileWriter.WriteLine(stringCastedItem);
+                                break;
+
+                            default:
+                                fileWriter.WriteLine(item.ToString());
+                                break;
+                        }
                     }
                 }
             }

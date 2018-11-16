@@ -5,10 +5,12 @@ namespace FactaLogicaSoftware.CryptoTools.Digests.KeyDerivation
     using System.Collections;
     using System.Security.Cryptography;
     using System.Text;
-
-#pragma warning disable CS1591
-    // TODO @NATHAN
-
+    
+    /// <inheritdoc />
+    /// <summary>
+    /// A custom implementation of Pbkdf2
+    /// for use with any HMAC algorithm
+    /// </summary>
     public sealed class Pbkdf2Advanced : KeyDerive
     {
         // needs to be fixed
@@ -32,9 +34,11 @@ namespace FactaLogicaSoftware.CryptoTools.Digests.KeyDerivation
         public Pbkdf2Advanced(
             string password,
             int saltSize,
-            uint iterations /*1000*/,
-            Type mode /* = typeof(HMACSHA256)*/)
+            uint iterations = 1000,
+            Type mode = null)
         {
+            mode = mode ?? typeof(HMACSHA256);
+
             if (saltSize < 0)
                 throw new ArgumentOutOfRangeException(nameof(saltSize));
 
@@ -58,26 +62,42 @@ namespace FactaLogicaSoftware.CryptoTools.Digests.KeyDerivation
             this.Reset();
         }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="password"></param>
+        /// <param name="salt"></param>
+        /// <param name="iterations"></param>
+        /// <param name="mode"></param>
         public Pbkdf2Advanced(
             string password,
             byte[] salt,
-            uint iterations /*=1000*/,
-            Type mode /* = typeof(HMACSHA256)*/)
+            uint iterations = 1000,
+            Type mode = null)
             : this(new UTF8Encoding(false).GetBytes(password), salt, iterations, mode)
         {
         }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="password"></param>
+        /// <param name="salt"></param>
+        /// <param name="iterations"></param>
+        /// <param name="mode"></param>
         public Pbkdf2Advanced(
             IEnumerable password,
             byte[] salt,
-            uint iterations /*=1000*/,
-            Type mode /* = typeof(HMACSHA256)*/)
+            uint iterations = 1000,
+            Type mode = null)
         {
+            mode = mode ?? typeof(HMACSHA256);
+
             this._salt = salt;
             this._iterations = iterations;
-            if (mode.IsSubclassOf(typeof(System.Security.Cryptography.HMAC)))
+            if (mode.IsSubclassOf(typeof(HMAC)))
             {
-                this._hmac = (System.Security.Cryptography.HMAC)Activator.CreateInstance(mode, password);
+                this._hmac = (HMAC)Activator.CreateInstance(mode, password);
             }
             else
             {
@@ -94,11 +114,10 @@ namespace FactaLogicaSoftware.CryptoTools.Digests.KeyDerivation
         public override byte[] Password
         {
             get => ProtectedData.Unprotect(this.BackEncryptedArray, null, DataProtectionScope.CurrentUser);
-            private protected set
-            {
-                this.BackEncryptedArray = ProtectedData.Protect(value, null, DataProtectionScope.CurrentUser);
-            }
+            private protected set => this.BackEncryptedArray = ProtectedData.Protect(value, null, DataProtectionScope.CurrentUser);
         }
+
+        /// <inheritdoc />
 
         public override object PerformanceValues
         {
@@ -106,6 +125,7 @@ namespace FactaLogicaSoftware.CryptoTools.Digests.KeyDerivation
             private protected set => this._iterations = (uint)value;
         }
 
+        /// <inheritdoc />
         public override byte[] GetBytes(int length)
         {
             if (length <= 0)
@@ -157,6 +177,7 @@ namespace FactaLogicaSoftware.CryptoTools.Digests.KeyDerivation
             return password;
         }
 
+        /// <inheritdoc />
         public override void Reset()
         {
             if (this._buffer != null)
@@ -168,7 +189,13 @@ namespace FactaLogicaSoftware.CryptoTools.Digests.KeyDerivation
             this._blockCount = 1;
             this._begin = this._end = 0;
         }
-
+        
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <param name="performanceDerivative"></param>
+        /// <param name="milliseconds"></param>
+        /// <returns></returns>
         public static ulong TransformPerformance(PerformanceDerivative performanceDerivative, ulong milliseconds)
         {
             return performanceDerivative.TransformToRfc2898(milliseconds);

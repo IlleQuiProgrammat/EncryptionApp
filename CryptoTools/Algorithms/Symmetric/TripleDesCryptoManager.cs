@@ -87,8 +87,8 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// <summary>
         /// Defines the maximum size read through streams and uses TripleDESCng
         /// </summary>
-        /// <param name="memoryConst">The number of bytes to read and write</param>
-        public TripleDesCryptoManager(int memoryConst) : this(memoryConst, DefaultAlgorithm)
+        /// <param name="bufferSize">The number of bytes to read and write</param>
+        public TripleDesCryptoManager(int bufferSize) : this(bufferSize, DefaultAlgorithm)
         {
         }
 
@@ -105,9 +105,9 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// <summary>
         /// Uses custom read/write values and a TripleDES algorithm of your choice
         /// </summary>
-        /// <param name="memoryConst">The number of bytes to read and write</param>
+        /// <param name="bufferSize">The number of bytes to read and write</param>
         /// <param name="algorithm">The algorithm to use</param>
-        public TripleDesCryptoManager(int memoryConst, [NotNull] SymmetricAlgorithm algorithm) : base(memoryConst, algorithm)
+        public TripleDesCryptoManager(int bufferSize, [NotNull] SymmetricAlgorithm algorithm) : base(bufferSize, algorithm)
         {
             this.KeySize = algorithm.KeySize;
 

@@ -14,11 +14,10 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
     /// </summary>
     public sealed class Rc2CryptoManager : SymmetricCryptoManager
     {
-        // TODO 4- 128 bits in 8 bit increments
         /// <summary>
         /// The valid key sizes for this algorithm
         /// </summary>
-        public static readonly int[] KeySizes = { 128 };
+        public static readonly int[] KeySizes = Enumerable.Range(40, 128).Where(i => i % 8 == 0).ToArray();
 
         private byte[] _initializationVector;
 
@@ -91,8 +90,8 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// <summary>
         /// Defines the maximum size read through streams and uses RC2CryptoServiceProvider
         /// </summary>
-        /// <param name="memoryConst">The number of bytes to read and write</param>
-        public Rc2CryptoManager(int memoryConst) : this(memoryConst, DefaultAlgorithm)
+        /// <param name="bufferSize">The number of bytes to read and write</param>
+        public Rc2CryptoManager(int bufferSize) : this(bufferSize, DefaultAlgorithm)
         {
         }
 
@@ -109,9 +108,9 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// <summary>
         /// Uses custom read/write values and an RC2 algorithm of your choice
         /// </summary>
-        /// <param name="memoryConst">The number of bytes to read and write</param>
+        /// <param name="bufferSize">The number of bytes to read and write</param>
         /// <param name="algorithm">The algorithm to use</param>
-        public Rc2CryptoManager(int memoryConst, [NotNull] SymmetricAlgorithm algorithm) : base(memoryConst, algorithm)
+        public Rc2CryptoManager(int bufferSize, [NotNull] SymmetricAlgorithm algorithm) : base(bufferSize, algorithm)
         {
             this.KeySize = algorithm.KeySize;
 
