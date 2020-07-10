@@ -10,7 +10,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
     /// including an optional HMAC and key derivation
     /// contract
     /// </summary>
-    public class TransformationContract
+    public readonly struct TransformationContract
     {
         /// <summary>
         /// 
@@ -38,32 +38,32 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
         /// The CryptoManager used for transformation
         /// </summary>
         [NotNull]
-        public Type CryptoManager { get; }
+        public readonly Type CryptoManager;
 
         /// <summary>
         /// The size, in bytes, to use for the
         /// initialization vector
         /// </summary>
-        public uint InitializationVectorSizeBytes { get; }
+        public readonly uint InitializationVectorSizeBytes;
 
         /// <summary>
         /// The CipherMode used for encryption
         /// </summary>
-        public CipherMode CipherMode { get; }
+        public readonly CipherMode CipherMode;
 
         /// <summary>
         /// The PaddingMode used for encryption
         /// </summary>
-        public PaddingMode PaddingMode { get; }
+        public readonly PaddingMode PaddingMode;
 
         /// <summary>
         /// The key size, in bits, used
         /// </summary>
-        public uint KeySize { get; }
+        public readonly uint KeySize;
 
         /// <summary>
         /// The block size, in bits, used
         /// </summary>
-        public uint BlockSize { get; }
+        public readonly uint BlockSize;
     }
 }

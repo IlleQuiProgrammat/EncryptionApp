@@ -13,7 +13,6 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
         /// The class containing the information
         /// defining how to transform the data
         /// </summary>
-        [NotNull]
         public TransformationContract TransformationContract { get; }
 
         /// <summary>
@@ -22,7 +21,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
         /// or null to represent that the password is the key
         /// </summary>
         [CanBeNull]
-        public KeyContract InstanceKeyContract { get; }
+        public KeyContract? InstanceKeyContract { get; }
 
         /// <summary>
         /// The class containing the information on
@@ -30,7 +29,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
         /// or null to represent the data cannot be verified
         /// </summary>
         [CanBeNull]
-        public HmacContract HmacContract { get; }
+        public HmacContract? HmacContract { get; }
 
         /// <summary>
         /// Creates a new instance of the SymmetricCryptographicContract
@@ -39,12 +38,12 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Contracts
         /// <param name="transformationContract"></param>
         /// <param name="instanceKeyContract"></param>
         /// <param name="hmacContract"></param>
-        public SymmetricCryptographicContract([NotNull] TransformationContract transformationContract, [CanBeNull] KeyContract instanceKeyContract = null, [CanBeNull] HmacContract hmacContract = null)
+        public SymmetricCryptographicContract(TransformationContract transformationContract, [CanBeNull] KeyContract? instanceKeyContract = null, [CanBeNull] HmacContract? hmacContract = null)
         {
-            this.TransformationContract = transformationContract ??
-                                          throw new ArgumentNullException(nameof(transformationContract));
-            this.InstanceKeyContract = instanceKeyContract ??
-                                       throw new ArgumentNullException(nameof(instanceKeyContract));
+            this.TransformationContract = transformationContract;
+
+            this.InstanceKeyContract = instanceKeyContract;
+
             this.HmacContract = hmacContract;
         }
     }

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Text;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
 {
