@@ -12,7 +12,10 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
     public sealed class TripleDesCryptoManager : SymmetricCryptoManager
     {
         // TODO check if 128 bits is supported
-        private static readonly int[] KeySizes = { 192 };
+        /// <summary>
+        /// The valid key sizes for this algorithm
+        /// </summary>
+        public static readonly int[] KeySizes = { 192 };
 
         private byte[] _initializationVector;
 
@@ -22,6 +25,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// </summary>
         public const long MaxSecureFileSize = 1024 * 1024 * 1024 * 24L;
 
+        /// <inheritdoc />
         /// <summary>
         /// The initialization vector used for
         /// transformation
@@ -29,15 +33,15 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// <remarks>You can leave
         /// this empty and pass the IV as a function
         /// argument instead</remarks>
-        public byte[] InitializationVector
+        public override byte[] InitializationVector
         {
             get => this._initializationVector;
             set
             {
-                if (value?.Length < this.SymmetricAlgorithm.BlockSize)
+                if (value.Length * 8 < this.SymmetricAlgorithm.BlockSize)
                     throw new ArgumentException("Length of IV must be at least as much as length of block size");
 
-                this._initializationVector = value ?? throw new ArgumentNullException(nameof(value));
+                this._initializationVector = value;
             }
         }
 
@@ -56,7 +60,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
                 {
                     throw new ArgumentException("Key is not a valid length");
                 }
-
+                
                 SymmetricAlgorithm.KeySize = value;
             }
         }
@@ -69,11 +73,11 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             Mode = CipherMode.CBC
         };
 
-        private static int DefaultChunkSize => 1024 * 1024 * 4;
+        private static int DefaultChunkSize => 1024 * 4;
 
         /// <inheritdoc />
         /// <summary>
-        /// The default constructor which uses 4mb of memory and uses TripleDESCng
+        /// The default constructor which uses 4kb of memory and uses TripleDESCng
         /// </summary>
         public TripleDesCryptoManager() : this(DefaultChunkSize)
         {
@@ -83,14 +87,14 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// <summary>
         /// Defines the maximum size read through streams and uses TripleDESCng
         /// </summary>
-        /// <param name="memoryConst">The number of bytes to read and write</param>
-        public TripleDesCryptoManager(int memoryConst) : this(memoryConst, DefaultAlgorithm)
+        /// <param name="bufferSize">The number of bytes to read and write</param>
+        public TripleDesCryptoManager(int bufferSize) : this(bufferSize, DefaultAlgorithm)
         {
         }
 
         /// <inheritdoc />
         /// <summary>
-        /// Uses 4mb read/write values and a TripleDES algorithm of your choice
+        /// Uses 4kb read/write values and a TripleDES algorithm of your choice
         /// </summary>
         /// <param name="algorithm">The algorithm to use</param>
         public TripleDesCryptoManager([NotNull] SymmetricAlgorithm algorithm) : this(DefaultChunkSize, algorithm)
@@ -101,10 +105,12 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
         /// <summary>
         /// Uses custom read/write values and a TripleDES algorithm of your choice
         /// </summary>
-        /// <param name="memoryConst">The number of bytes to read and write</param>
+        /// <param name="bufferSize">The number of bytes to read and write</param>
         /// <param name="algorithm">The algorithm to use</param>
-        public TripleDesCryptoManager(int memoryConst, [NotNull] SymmetricAlgorithm algorithm) : base(memoryConst, algorithm)
+        public TripleDesCryptoManager(int bufferSize, [NotNull] SymmetricAlgorithm algorithm) : base(bufferSize, algorithm)
         {
+            this.KeySize = algorithm.KeySize;
+
             // Check if the algorithm is part of the 2 .NET algorithms currently FIPS compliant
             if (algorithm is AesCng || algorithm is AesCryptoServiceProvider || algorithm is TripleDESCng)
             {
@@ -134,7 +140,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             if (iv == null)
                 iv = this.InitializationVector ?? throw new ArgumentNullException(nameof(this.InitializationVector));
 
-            if (key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + "must be the length of KeySize - " + KeySize + " bits");
+            if (key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + " must be the length of KeySize - " + KeySize + " bits");
 
             if (this.InitializationVector.Length * 8 < this.SymmetricAlgorithm.BlockSize)
                 throw new ArgumentException("Initialization vector set in class must be at least as many bits as the block size");
@@ -175,7 +181,7 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             if (iv == null)
                 iv = this.InitializationVector ?? throw new ArgumentNullException(nameof(this.InitializationVector));
 
-            if (key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + "must be the length of KeySize - " + KeySize + " bits");
+            if (key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + " must be the length of KeySize - " + KeySize + " bits");
 
             if (this.InitializationVector.Length * 8 < this.SymmetricAlgorithm.BlockSize)
                 throw new ArgumentException("Initialization vector set in class must be at least as many bits as the block size");
@@ -215,27 +221,29 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             if (iv == null)
                 iv = this.InitializationVector ?? throw new ArgumentNullException(nameof(this.InitializationVector));
 
-            if (key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + "must be the length of KeySize - " + KeySize + " bits");
+            if (key.Length * 8 != KeySize) throw new ArgumentException(nameof(key) + " must be the length of KeySize - " + KeySize + " bits");
 
-            if (this.InitializationVector.Length * 8 < this.SymmetricAlgorithm.BlockSize)
+            if (iv.Length * 8 < this.SymmetricAlgorithm.BlockSize)
                 throw new ArgumentException("Initialization vector set in class must be at least as many bits as the block size");
 
             Contract.EndContractBlock();
 
             #endregion CONTRACT
 
-            // TripleDES values
-            SymmetricAlgorithm.Key = key;
-            SymmetricAlgorithm.IV = iv;
+            // TripleDes values
+            this.SymmetricAlgorithm.Key = key;
+            this.SymmetricAlgorithm.IV = iv.Take(this.SymmetricAlgorithm.BlockSize / 8).ToArray();
 
-            // Put the plaintext byte array into memory, and read it through the crypto stream to encrypt it
+
+            // Put the cipher text byte array into memory, and read it through the crypto stream to encrypt it
             var memStream = new MemoryStream(data);
-            var cryptoStream = new CryptoStream(memStream, SymmetricAlgorithm.CreateEncryptor(), CryptoStreamMode.Read);
-            using (var binReader = new BinaryReader(cryptoStream))
+            using (var cryptoStream = new CryptoStream(memStream, this.SymmetricAlgorithm.CreateEncryptor(), CryptoStreamMode.Read))
+            using (var copyStream = new MemoryStream())
             {
                 try
                 {
-                    return binReader.ReadBytes((int)memStream.Length);
+                    cryptoStream.CopyTo(copyStream);
+                    return copyStream.ToArray();
                 }
                 catch (OverflowException e)
                 {
@@ -261,33 +269,35 @@ namespace FactaLogicaSoftware.CryptoTools.Algorithms.Symmetric
             if (iv == null)
                 iv = this.InitializationVector ?? throw new ArgumentNullException(nameof(this.InitializationVector));
 
-            if (key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + "must be the length of KeySize - " + KeySize + " bits");
+            if (key.Length * 8 != KeySize) throw new ArgumentOutOfRangeException(nameof(key) + " must be the length of KeySize - " + KeySize + " bits");
 
-            if (this.InitializationVector.Length * 8 < this.SymmetricAlgorithm.BlockSize)
+            if (iv.Length * 8 < this.SymmetricAlgorithm.BlockSize)
                 throw new ArgumentException("Initialization vector set in class must be at least as many bits as the block size");
 
             Contract.EndContractBlock();
 
             #endregion CONTRACT
 
-            // TripleDES values
-            SymmetricAlgorithm.Key = key;
-            SymmetricAlgorithm.IV = iv;
+            // TripleDes values
+            this.SymmetricAlgorithm.Key = key;
+            this.SymmetricAlgorithm.IV = iv.Take(this.SymmetricAlgorithm.BlockSize / 8).ToArray();
 
-            // Put the cipher-text byte array into memory, and read it through the crypto stream to decrypt it
+
+            // Put the cipher text byte array into memory, and read it through the crypto stream to decrypt it
             var memStream = new MemoryStream(data);
-            var cryptoStream = new CryptoStream(memStream, SymmetricAlgorithm.CreateDecryptor(), CryptoStreamMode.Read);
-            using (var binReader = new BinaryReader(cryptoStream))
+            using (var cryptoStream = new CryptoStream(memStream, this.SymmetricAlgorithm.CreateDecryptor(), CryptoStreamMode.Read))
+            using (var copyStream = new MemoryStream())
             {
                 try
                 {
-                    return binReader.ReadBytes((int)memStream.Length);
+                    cryptoStream.CopyTo(copyStream);
+                    return copyStream.ToArray();
                 }
                 catch (OverflowException e)
                 {
-                    throw new OverflowException("Byte array to large to encrypt", e);
+                    throw new OverflowException("Byte array to large to decrypt", e);
                 }
             }
         }
     }
-}
+    }

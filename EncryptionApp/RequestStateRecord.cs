@@ -5,7 +5,7 @@ namespace Encryption_App
 {
     internal class RequestStateRecord
     {
-        public MainWindow.ProcessType ProcessType;
+        public readonly MainWindow.ProcessType ProcessType;
         public readonly string FilePath;
         public readonly SymmetricCryptographicContract Contract;
 

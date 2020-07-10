@@ -8,7 +8,7 @@
     /// Event args representing a change in the memory chunk
     /// value for
     /// </summary>
-    public class MemoryChunkValueChangedEventArgs : EventArgs
+    public class BufferSizeChangedEventArgs : EventArgs
     {
         /// <summary>
         /// The new value used for chunking
@@ -23,11 +23,11 @@
         /// <inheritdoc />
         /// <summary>
         /// Creates a new instance with of
-        /// MemoryChunkValueChangedEventArgs
+        /// BufferSizeChangedEventArgs
         /// </summary>
         /// <param name="newValue">The new chunk value</param>
         /// <param name="sender">The sending object</param>
-        public MemoryChunkValueChangedEventArgs(int newValue, SymmetricCryptoManager sender)
+        public BufferSizeChangedEventArgs(int newValue, SymmetricCryptoManager sender)
         {
             this.NewValue = newValue;
             this.Sender = sender;

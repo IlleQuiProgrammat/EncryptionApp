@@ -3,18 +3,17 @@ using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
 {
-    /// <inheritdoc />
+    /// <inheritdoc cref="CryptographicRepresentative"/>
     /// <summary>
     /// Represents how a piece of data was encrypted,
     /// including all unique instances, unlike a
     /// SymmetricCryptographicContract
     /// </summary>
-    public class SymmetricCryptographicRepresentative : CryptographicRepresentative
+    public sealed class SymmetricCryptographicRepresentative : CryptographicRepresentative, IEquatable<SymmetricCryptographicRepresentative> // Don't unseal
     {
         /// <summary>
         /// The constructor used for reading
@@ -24,42 +23,50 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
             this.Type = InfoType.Read;
             this.Encoding = Encoding.UTF8;
         }
+        /// <summary>
+        /// The constructor used for reading,
+        /// taking the file path to read the values from
+        /// </summary>
+        public SymmetricCryptographicRepresentative(string filePath)
+        {
+            this.Type = InfoType.Read;
+            this.Encoding = Encoding.UTF8;
+            this.ReadHeaderFromFile(filePath);
+        }
 
         /// <summary>
         /// The constructor for creating an object used for writing
         /// or information
         /// </summary>
-        public SymmetricCryptographicRepresentative([NotNull] TransformationRepresentative transformationModeInfo, [CanBeNull] KeyRepresentative instanceKeyCreator = null, [CanBeNull] HmacRepresentative hmacRepresentative = null)
+        [JsonConstructor]
+        public SymmetricCryptographicRepresentative(TransformationRepresentative transformationModeInfo, KeyRepresentative? instanceKeyCreator = null, HmacRepresentative? hmacRepresentative = null)
         {
             this.Type = InfoType.Write;
             this.TransformationModeInfo = transformationModeInfo;
             this.InstanceKeyCreator = instanceKeyCreator;
-            this.Hmac = hmacRepresentative;
+            this.HmacRepresentative = hmacRepresentative;
             this.Encoding = Encoding.UTF8;
         }
-
-        // TODO immutable? to think
 
         /// <summary>
         /// The representation of the HMAC
         /// authenticator for a piece of data
         /// </summary>
         [CanBeNull]
-        public HmacRepresentative Hmac { get; }
+        public HmacRepresentative? HmacRepresentative { get; private set; }
 
         /// <summary>
         /// The representation of the encryption
         /// of certain data
         /// </summary>
-        [CanBeNull]
-        public TransformationRepresentative TransformationModeInfo { get; }
+        public TransformationRepresentative TransformationModeInfo { get; private set; }
 
         /// <summary>
         /// The representation of how to derive the key
         /// for a certain piece of data
         /// </summary>
         [CanBeNull]
-        public KeyRepresentative InstanceKeyCreator { get; }
+        public KeyRepresentative? InstanceKeyCreator { get; private set; }
 
         /// <inheritdoc />
         /// <summary>
@@ -81,7 +88,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
         {
             // Get the index of the start and end of the JSON object
 
-            int start = header.IndexOf(StartChars, StringComparison.Ordinal) +  StartChars.Length; // + StartChars.Length, IndexOf gets the first character of the string search, so adding the length pushes it to the end of that
+            int start = header.IndexOf(StartChars, StringComparison.Ordinal) + StartChars.Length; // + StartChars.Length, IndexOf gets the first character of the string search, so adding the length pushes it to the end of that
             int end = header.IndexOf(EndChars, StringComparison.Ordinal);
 
             // If either search failed and returned -1, fail, as the header is corrupted
@@ -108,25 +115,13 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
                 throw new ArgumentException("String should not contain BOM");
             }
 
-            // Set the type and length
-            data.Type = InfoType.Write;
-            data.HeaderLength = this.HeaderLength;
-
-            FieldInfo[] fields = this.GetType().GetFields(BindingFlags.Public
-                                                          | BindingFlags.Instance);
-            foreach (FieldInfo field in fields)
-            {
-                object value = field.GetValue(data);
-                field.SetValue(this, value);
-            }
-
-            PropertyInfo[] properties = this.GetType().GetProperties(BindingFlags.Public
-                                                          | BindingFlags.Instance);
-            foreach (PropertyInfo property in properties)
-            {
-                object value = property.GetValue(data);
-                property.SetValue(this, value);
-            }
+            // Don't use reflection please, it's slow :)
+            this.InstanceKeyCreator = data.InstanceKeyCreator;
+            this.HmacRepresentative = data.HmacRepresentative;
+            this.TransformationModeInfo = data.TransformationModeInfo;
+            this.Type = InfoType.Read;
+            this.HeaderLength = data.HeaderLength;
+            this.Encoding = data.Encoding;
         }
 
         /// <inheritdoc />
@@ -142,7 +137,7 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
             using (var binReader = new BinaryReader(fileStream, this.Encoding ?? Encoding.UTF8))
             {
                 // The header limit is 5KB, so read that and we know we have it all
-                string header = null;
+                string header;
 
                 int toReadVal = 1024 * 3;
 
@@ -196,27 +191,16 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
                                     + byteOrderMarkLength; // 3 is length of BOM
 
                 // Create the data deserialized to a cryptographic object
-                var data = JsonConvert.DeserializeObject<SymmetricCryptographicRepresentative>(jsonString);
-
-                // Set the type and length
-                data.Type = InfoType.Read;
-                data.HeaderLength = this.HeaderLength;
-
-                FieldInfo[] fields = this.GetType().GetFields(BindingFlags.Public
-                                                              | BindingFlags.Instance);
-                foreach (FieldInfo field in fields)
-                {
-                    object value = field.GetValue(data);
-                    field.SetValue(this, value);
-                }
-
-                PropertyInfo[] properties = this.GetType().GetProperties(BindingFlags.Public
-                                                                         | BindingFlags.Instance);
-                foreach (PropertyInfo property in properties)
-                {
-                    object value = property.GetValue(data);
-                    property.SetValue(this, value);
-                }
+                var deserializeObject = JsonConvert.DeserializeObject<SymmetricCryptographicRepresentative>(jsonString);
+                deserializeObject.Type = InfoType.Read;
+                
+                // Don't use reflection please, it's slow :)
+                this.InstanceKeyCreator = deserializeObject.InstanceKeyCreator;
+                this.HmacRepresentative = deserializeObject.HmacRepresentative;
+                this.TransformationModeInfo = deserializeObject.TransformationModeInfo;
+                this.Type = InfoType.Read;
+                this.HeaderLength = deserializeObject.HeaderLength;
+                this.Encoding = deserializeObject.Encoding;
             }
         }
 
@@ -242,7 +226,47 @@ namespace FactaLogicaSoftware.CryptoTools.Information.Representatives
 
             // Define the length of the header
             this.HeaderLength = StartChars.Length + json.Length + EndChars.Length;
-            this.Type = InfoType.Write;
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Compares the 2 objects for reference
+        /// OR value equality
+        /// </summary>
+        /// <param name="other">The other object to test</param>
+        /// <returns></returns>
+        public bool Equals(SymmetricCryptographicRepresentative other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return this.HmacRepresentative == other.HmacRepresentative && this.TransformationModeInfo == other.TransformationModeInfo && this.InstanceKeyCreator == other.InstanceKeyCreator;
+        }
+
+        /// <inheritdoc />
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == this.GetType() && Equals((SymmetricCryptographicRepresentative)obj);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return 0;
+        }
+
+        /// <inheritdoc cref="IEquatable{T}"/>
+        public static bool operator ==(SymmetricCryptographicRepresentative left,
+            SymmetricCryptographicRepresentative right)
+        {
+            return left?.Equals(right) ?? false;
+        }
+
+        /// <inheritdoc cref="IEquatable{T}"/>
+        public static bool operator !=(SymmetricCryptographicRepresentative left, SymmetricCryptographicRepresentative right)
+        {
+            return !(left == right);
         }
     }
 }
