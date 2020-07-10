@@ -35,32 +35,13 @@ namespace Encryption_App
         public bool FileContainsHeader()
         {
             var buff = new char[1024];
-            string checkString;
-
-            try
-            {
-                using (var reader = new StreamReader(this._filePath))
+            string checkString = string.Create(1024, 0, (buff, _) =>
                 {
-                    try
+                    using (var reader = File.OpenText(_filePath))
                     {
-                        reader.ReadBlock(buff, 0, buff.Length);
+                        reader.ReadBlock(buff);
                     }
-                    catch (IOException e)
-                    {
-                        FileStatics.WriteToLogFile(e);
-                        MessageBox.Show("Unknown fatal IO exception occured - check log file for details");
-                        throw;
-                    }
-
-                    checkString = new string(buff);
-                }
-            }
-            catch (IOException e)
-            {
-                FileStatics.WriteToLogFile(e);
-                MessageBox.Show("Unknown fatal IO exception occured - check log file for details");
-                throw;
-            }
+                });
 
             return checkString.IndexOf(CryptographicRepresentative.StartChars, StringComparison.Ordinal) != -1 &&
                    checkString.IndexOf(CryptographicRepresentative.EndChars, StringComparison.Ordinal) != -1;
@@ -99,7 +80,7 @@ namespace Encryption_App
 
             var performanceDerivative =
                     new PerformanceDerivative(request.Contract.InstanceKeyContract.Value.PerformanceDerivative);
-            
+
 
             ((IProgress<int>)this._progress)?.Report(25);
 
@@ -130,7 +111,7 @@ namespace Encryption_App
             if (request.Contract.HmacContract != null)
             {
                 // Create the algorithm using reflection
-                hmacAlg = (HMAC) Activator.CreateInstance(request.Contract.HmacContract.Value.HashAlgorithm);
+                hmacAlg = (HMAC)Activator.CreateInstance(request.Contract.HmacContract.Value.HashAlgorithm);
             }
 
             Aes aesAlgorithm = new AesCng
@@ -252,7 +233,7 @@ namespace Encryption_App
             var encryptor =
                 (SymmetricCryptoManager)Activator.CreateInstance(request.Contract.TransformationContract.CryptoManager,
                     @params);
-            
+
             // Create a handle to the key to allow control of it
             GCHandle keyHandle = GCHandle.Alloc(key, GCHandleType.Pinned);
 
@@ -413,7 +394,7 @@ namespace Encryption_App
             ((IProgress<int>)this._progress)?.Report(0);
 
             ((IProgress<int>)this._progress)?.Report(10);
-            
+
             HMAC hmacAlg = null;
 
             if (cryptographicRepresentative.HmacRepresentative != null)
